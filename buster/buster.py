@@ -61,7 +61,7 @@ def main():
             ghost_path = arguments['--ghost_path']
         else:
             ghost_path = os.path.join(os.getcwd(), 'ghost')
-        shutil.copytree(os.path.join(ghost_path, 'content/images'), os.path.join(static_path, 'content/images'), False)
+        copyFiles(os.path.join(ghost_path, 'content/images'), os.path.join(static_path, 'content/images'))
 
     elif arguments['preview']:
         os.chdir(static_path)
@@ -133,6 +133,19 @@ def main():
 
     else:
         print __doc__
+
+def copyFiles(sourceDir, targetDir):
+    for f in os.listdir(sourceDir):
+        sourceF = os.path.join(sourceDir, f)
+        targetF = os.path.join(targetDir, f)
+        if os.path.isfile(sourceF):
+            if not os.path.exists(targetDir):
+                os.makedirs(targetDir)               
+            if not os.path.exists(targetF) or (os.path.exists(targetF) and (os.path.getsize(targetF) != os.path.getsize(sourceF))):
+                open(targetF, "wb").write(open(sourceF, "rb").read())
+           
+        if os.path.isdir(sourceF):   
+            copyFiles(sourceF, targetF)
 
 if __name__ == '__main__':
     main()
