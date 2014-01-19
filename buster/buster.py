@@ -2,7 +2,7 @@
 
 Usage:
   buster.py setup [--gh-repo=<repo-url>] [--dir=<path>]
-  buster.py generate [--domain=<local-address>] [--dir=<path>]
+  buster.py generate [--domain=<local-address>] [--dir=<path>] [--ghost_path=<path>]
   buster.py preview [--dir=<path>]
   buster.py deploy [--dir=<path>]
   buster.py add-domain <domain-name> [--dir=<path>]
@@ -15,6 +15,7 @@ Options:
   --dir=<path>              Absolute path of directory to store static pages.
   --domain=<local-address>  Address of local ghost installation [default: local.tryghost.org].
   --gh-repo=<repo-url>      URL of your gh-pages repository.
+  --ghost_path=<path>              Absolute path of directory to Ghost.
 """
 
 import os
@@ -54,6 +55,13 @@ def main():
                   newname = re.sub(r'\?.*', '', filename)
                   print "Rename", filename, "=>", newname
                   os.rename(os.path.join(root, filename), os.path.join(root, newname)) 
+
+        # copy images in GHOST_PATH/content/images folder into static folder
+        if arguments['--ghost_path'] is not None:
+            ghost_path = arguments['--ghost_path']
+        else:
+            ghost_path = os.path.join(os.getcwd(), 'ghost')
+        shutil.copytree(os.path.join(ghost_path, 'content/images'), os.path.join(static_path, 'content/images'), False)
 
     elif arguments['preview']:
         os.chdir(static_path)
